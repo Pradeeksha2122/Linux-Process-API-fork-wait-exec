@@ -130,7 +130,7 @@ chmod 755 exitwait.o
 
 
 
-## OUTPUT
+## Output
 <img width="480" height="276" alt="image" src="https://github.com/user-attachments/assets/22cba131-1922-478f-b4bc-66109159e3e4" />
 
 
