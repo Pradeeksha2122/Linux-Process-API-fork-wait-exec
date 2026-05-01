@@ -65,9 +65,7 @@ chmod 755 forkcheck.o
 
 
 ## OUTPUT
-<img width="684" height="319" alt="image" src="https://github.com/user-attachments/assets/a43f5a57-7a4a-4524-ae35-e31822663cc3" />
-
-
+<img width="758" height="255" alt="image" src="https://github.com/user-attachments/assets/d2ce70f7-c184-41fa-a917-1c388d35e740" />
 
 
 
@@ -133,7 +131,7 @@ chmod 755 exitwait.o
 
 
 ## OUTPUT
-<img width="908" height="318" alt="image" src="https://github.com/user-attachments/assets/c387414b-0d97-4244-8f49-b6af33f06be3" />
+<img width="480" height="276" alt="image" src="https://github.com/user-attachments/assets/22cba131-1922-478f-b4bc-66109159e3e4" />
 
 
 
