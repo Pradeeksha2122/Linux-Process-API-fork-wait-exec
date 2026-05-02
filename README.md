@@ -27,45 +27,31 @@ Test the C Program for the desired output.
 
 ```
 #include <stdio.h>
-#include <sys/types.h>
+#include <stdlib.h>
 #include <unistd.h>
-int main(void)
-{	//variable to store calling function's process id
-	pid_t process_id;
-	//variable to store parent function's process id
-	pid_t p_process_id;
-	//getpid() - will return process id of calling function
-	process_id = getpid();
-	//getppid() - will return process id of parent function
-	p_process_id = getppid();
-	//printing the process ids
+#include <sys/wait.h>   // <-- IMPORTANT
 
-//printing the process ids
-	printf("The process id: %d\n",process_id);
-	printf("The process id of parent function: %d\n",p_process_id);
-	return 0; 
+int main() {
+    int pid = fork();
+
+    if (pid == 0) { 
+        printf("I am child, my PID is %d\n", getpid()); 
+        printf("My parent PID is: %d\n", getppid()); 
+        sleep(2);
+    } else { 
+        printf("I am parent, my PID is %d\n", getpid()); 
+        wait(NULL); 
+    }
+
+    return 0;
 }
-
-```
-gcc forkcheck.c -o forkcheck.o
-
-chmod 755 forkcheck.o
-
-./forkcheck.o
-
-
-
-
-
-
-
-
 
 
 
 
 ## OUTPUT
-<img width="758" height="255" alt="image" src="https://github.com/user-attachments/assets/d2ce70f7-c184-41fa-a917-1c388d35e740" />
+
+<img width="910" height="970" alt="image" src="https://github.com/user-attachments/assets/6f3f24b2-12bd-4242-9e73-97c5e0501b5c" />
 
 
 
@@ -74,64 +60,64 @@ chmod 755 forkcheck.o
 
 
 
-
-
-## C Program to execute Linux system commands using Linux API system calls exec() , exit() , wait() family
-
-nano exitwait.c
-```
+## C Program to execute Linux system commands using Linux API system calls exec() , exit() , wait() familyy
+ 
+```bash
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/wait.h>
 #include <unistd.h>
+#include <sys/wait.h>
 
 int main() {
     int status;
-    
+
     printf("Running ps with execlp\n");
+
     if (fork() == 0) {
-        execlp("ps", "ps", "-f", NULL);
+        execlp("ps", "ps", "ax", NULL);
+        exit(1); // runs only if execlp fails
+    }
+    wait(&status);
+
+    if (WIFEXITED(status))
+        printf("Child exited with status %d\n", WEXITSTATUS(status));
+    else
+        printf("Child did not exit successfully\n");
+
+    printf("Done.\n");
+
+    printf("Running ps with full path\n");
+
+    if (fork() == 0) {
+        execl("/bin/ps", "ps", "ax", NULL);
         exit(1);
     }
     wait(&status);
-    
+
+    if (WIFEXITED(status))
+        printf("Child exited with status %d\n", WEXITSTATUS(status));
+    else
+        printf("Child did not exit successfully\n");
+
     printf("Done.\n");
+
     return 0;
 }
-
-```
-gcc exitwait.c -o exitwait.o
-
-chmod 755 exitwait.o
-
-./exitwait.o
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
 
 
 ## Output
-<img width="480" height="276" alt="image" src="https://github.com/user-attachments/assets/22cba131-1922-478f-b4bc-66109159e3e4" />
+<img width="918" height="745" alt="image" src="https://github.com/user-attachments/assets/ed6a38c4-7283-4d3e-be47-3142f4afcca5" />
+<img width="836" height="733" alt="image" src="https://github.com/user-attachments/assets/b638aebe-0a3c-4a9c-90c8-2e171ba44483" />
+<img width="897" height="728" alt="image" src="https://github.com/user-attachments/assets/2c32f98c-5cac-4975-b34c-e33e356f2ff5" />
+<img width="885" height="735" alt="image" src="https://github.com/user-attachments/assets/cccf534f-243d-4a2f-84eb-d141be2f8611" />
+<img width="920" height="695" alt="image" src="https://github.com/user-attachments/assets/d906b410-c476-4616-92e2-eb23446685bb" />
+<img width="924" height="682" alt="image" src="https://github.com/user-attachments/assets/23a844cf-ffd6-4510-a6c9-1e869eacc0f4" />
+<img width="924" height="718" alt="image" src="https://github.com/user-attachments/assets/96f2ddf7-102e-47c0-8a1b-831e590d684e" />
+<img width="921" height="736" alt="image" src="https://github.com/user-attachments/assets/f110dff7-ebeb-4fb9-ba4c-4c84fdbb7cda" />
+<img width="913" height="250" alt="image" src="https://github.com/user-attachments/assets/0ace62ae-1a4f-4a87-937e-75be3c6df6c9" />
 
 
 
@@ -140,9 +126,51 @@ chmod 755 exitwait.o
 
 
 
+## C Program to execute Linux system commands using Linux API system calls exec() family
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
+int main() {
+    int status;
+    
+    printf("Running ps with execl\n");
+    if (fork() == 0) {
+        execl("ps", "ps", "-f", NULL);
+        perror("execl failed");
+        exit(1);
+    }
+    wait(&status);
+    
+    if (WIFEXITED(status)) {
+        printf("Child exited with status: %d\n", WEXITSTATUS(status));
+    } else {
+        printf("Child did not exit successfully\n");
+    }
+    
+    printf("Running ps with execlp (without full path)\n");
+    if (fork() == 0) {
+        execlp("ps", "ps", "-f", NULL);
+        perror("execlp failed");
+        exit(1);
+    }
+    wait(&status);
+    
+    if (WIFEXITED(status)) {
+        printf("Child exited for execlp with status: %d\n", WEXITSTATUS(status));
+    } else {
+        printf("Child did not exit successfully\n");
+    }
+    
+    printf("Done.\n");
+    return 0;
+}
 
+## output
 
+<img width="637" height="331" alt="image" src="https://github.com/user-attachments/assets/8a59ad7e-f724-4007-b64f-0c5bffe097c4" />
 
 
 
