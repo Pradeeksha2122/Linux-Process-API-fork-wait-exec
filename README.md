@@ -25,11 +25,10 @@ Test the C Program for the desired output.
 
 ## C Program to create new process using Linux API system calls fork() and getpid() , getppid() and to print process ID and parent Process ID using Linux API system calls
 
-```
+```bash
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <sys/wait.h>   // <-- IMPORTANT
 
 int main() {
     int pid = fork();
@@ -37,16 +36,13 @@ int main() {
     if (pid == 0) { 
         printf("I am child, my PID is %d\n", getpid()); 
         printf("My parent PID is: %d\n", getppid()); 
-        sleep(2);
+        sleep(2);  // Keep child alive for verification
     } else { 
         printf("I am parent, my PID is %d\n", getpid()); 
         wait(NULL); 
     }
-
-    return 0;
 }
-
-
+```
 
 
 ## OUTPUT
@@ -62,49 +58,65 @@ int main() {
 
 ## C Program to execute Linux system commands using Linux API system calls exec() , exit() , wait() familyy
  
+
+
+## OUTPUT
+![alt text](b.png) 
+![alt text](c.png)
+![alt text](d.png) 
+![alt text](e.png) 
+![alt text](f.png) 
+![alt text](g.png) 
+![alt text](h.png)
+![alt text](j.png)
+![alt text](k.png)
+
+
+
+## 3. C Program to execute Linux system commands using Linux API system calls exec() family
+
 ```bash
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
+#include <sys/types.h>
 #include <sys/wait.h>
+#include <unistd.h>
 
 int main() {
-    int status;
-
-    printf("Running ps with execlp\n");
-
-    if (fork() == 0) {
-        execlp("ps", "ps", "ax", NULL);
-        exit(1); // runs only if execlp fails
-    }
-    wait(&status);
-
-    if (WIFEXITED(status))
-        printf("Child exited with status %d\n", WEXITSTATUS(status));
-    else
-        printf("Child did not exit successfully\n");
-
-    printf("Done.\n");
-
-    printf("Running ps with full path\n");
-
-    if (fork() == 0) {
-        execl("/bin/ps", "ps", "ax", NULL);
-        exit(1);
-    }
-    wait(&status);
-
-    if (WIFEXITED(status))
-        printf("Child exited with status %d\n", WEXITSTATUS(status));
-    else
-        printf("Child did not exit successfully\n");
-
-    printf("Done.\n");
-
-    return 0;
+  int status;
+  
+  printf("Running ps with execl\n");
+  if (fork() == 0) {
+      execl("ps", "ps", "-f", NULL);
+      perror("execl failed");
+      exit(1);
+  }
+  wait(&status);
+  
+  if (WIFEXITED(status)) {
+      printf("Child exited with status: %d\n", WEXITSTATUS(status));
+  } else {
+      printf("Child did not exit successfully\n");
+  }
+  
+  printf("Running ps with execlp (without full path)\n");
+  if (fork() == 0) {
+      execlp("ps", "ps", "-f", NULL);
+      perror("execlp failed");
+      exit(1);
+  }
+  wait(&status);
+  
+  if (WIFEXITED(status)) {
+      printf("Child exited for execlp with status: %d\n", WEXITSTATUS(status));
+  } else {
+      printf("Child did not exit successfully\n");
+  }
+  
+  printf("Done.\n");
+  return 0;
 }
-
-
+```
 
 
 
